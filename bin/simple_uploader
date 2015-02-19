@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+require 'rack'
+require 'slop'
+
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'simple_uploader'
+
+cmd_opts = Slop.parse do |o|
+  o.string '-h', '--host', 'Specify hostname', default: '0.0.0.0'
+  o.integer '-p', '--port', 'Specify port number', default: '80'
+
+  o.on '--help', 'Show this help message' do
+    puts o
+    exit
+  end
+
+  o.on '-v', '--version', 'Print the version' do
+    puts SimpleUploader::VERSION
+    exit
+  end
+end
+
+options = {
+  app: SimpleUploader::Server,
+  server: 'webrick',
+  Host: cmd_opts['host'],
+  Port: cmd_opts['port']
+}
+
+Rack::Server.start(options)
